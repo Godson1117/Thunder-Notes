@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thunder News</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  </head>
+  <body class="container bg-dark text-white">
+    
+ <div class="alert alert-danger alert-dismissible fade show" style="display:none" role="alert">
+  <strong id="head">Error:</strong> Enter all the Fields....
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+ <div class="alert alert-success alert-dismissible fade show" style="display:none" role="alert">
+  <strong id="head">Success:</strong>Note Added....
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+  
+    <nav class="navbar navbar-expand-lg bg-secondary border border-dark rounded-4">
+  <div class="container">
+    <a class="navbar-brand text-info" href="#" style="text-shadow:2px 2px 1px red;font-size:20px">THUNDER NOTES⚡</a>
+   <form class="d-flex" role="search">
+        <input class="border rounded-pill form-control mr-1" type="search" placeholder="Search Notes Here" aria-label="Search" id="search">
+      </form>
+    </div>
+  </div>
+</nav>
+
+  <div class="my-3">
+  <label for="title" class="form-label">Title of Note</label>
+  <input type="text" class="rounded-3 form-control" id="title" placeholder="Enter the Title Here">
+  </div>
+  <div class="my-3">
+  <label for="description" class="rounded-3 form-label">Description of Note</label>
+  <textarea class="form-control" id="description" rows="3" placeholder="Enter the Note here"></textarea>
+  </div>
+  <button class="btn btn-outline-danger float-start" id="remove">Clear Notes</button>
+  <button type="button" class="btn btn-primary float-end" id="add">Add Note</button><br /><br />
+  <hr />
+  <h3>Available Notes</h3>
+  
+  <div id="noteContainer"></div>
+ 
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+      let search=document.getElementById('search')
+      let io1=document.getElementById('title')
+      let io2=document.getElementById('description')
+      let add=document.getElementById('add')
+      let noteContainer=document.getElementById('noteContainer')
+      let remove=document.getElementById('remove')
+      let data=localStorage.getItem('notes')
+      let notesArray
+      if(data != null){
+         notesArray=JSON.parse(data)
+      }
+      else
+        notesArray=[]
+      let noteObj={}
+      showNotes()
+      
+      add.addEventListener('click',()=> {
+        let alertBox
+        let title=io1.value
+        let desc=io2.value
+        alertBox=document.getElementsByClassName('alert')[0]
+        if(title=='' || desc==''){
+          alertBox.style.display='block'
+          setTimeout(()=>{
+            alertBox.style.display='none'
+          },3000)
+        }
+          
+        else{
+        noteObj.t=title
+        noteObj.d=desc
+        notesArray.push(noteObj)
+        localStorage.setItem('notes',JSON.stringify(notesArray))
+        io1.value=''
+        io2.value=''
+        let alertBox=document.getElementsByClassName('alert')[1]
+        alertBox.style.display='block'
+          setTimeout(()=>{
+            alertBox.style.display='none'
+          },3000)
+        showNotes()
+        }
+      })
+      
+      function showNotes() {
+        data=localStorage.getItem('notes')
+        let card=''
+        if(data != null)
+          notesArray=JSON.parse(data)
+        else
+          console.log("No notes")
+        notesArray.forEach((element,index)=> {
+        card +=`<div class="card my-3">
+        <div class="card-body">
+    <h5 class="card-title text-dark">${element.t}</h5>
+    <p class="card-text text-dark">${element.d}</p>
+    <button class="btn btn-primary" onclick="Delete(${index})">Remove</button>
+    <button class="btn btn-primary float-end" onclick="imp(${index})">Mark as Important</button>
+  </div>
+  </div>`
+       noteContainer.innerHTML=card
+        })
+      }
+      
+      remove.addEventListener('click',()=> {
+        if(confirm("Are You Sure to Delete all the Notes...?")){
+          localStorage.clear()
+        document.location.reload()  
+        }
+      })
+      
+      function Delete(index){
+        if(notesArray.length ==1){
+          notesArray.pop()
+          document.location.reload()
+        }
+        notesArray.splice(index,1)
+        localStorage.setItem('notes',JSON.stringify(notesArray))
+        showNotes()
+      }
+      
+      search.addEventListener('input',()=>{
+      let target=search.value
+      let cards=document.querySelectorAll('.card')
+      cards.forEach((element)=> {
+        let match=element.getElementsByTagName('h5')[0].innerText
+        if(match.includes(target))
+          element.style.display='block'
+        else
+          element.style.display='none'
+      })
+      })
+      
+    </script>
+  </body>
+</html>
